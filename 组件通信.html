@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>父子组件通信</title>
+	<script src="node_modules/vue/dist/vue.min.js"></script>
+</head>
+<body>
+	<div id="app">
+		<h1>{{ foo2 }}</h1>
+		<sub1 :a="foo2" :b="user"></sub1>
+		
+	</div>
+	<script>
+		new Vue({
+			el:'#app',
+			data:{
+				foo2:'我是父组件的root foo',
+				user:{
+					//普通数据类型，子组件也会受影响
+					//引用数据类型，无论是修改还是重新赋值都会受影响
+					name:'陈明',
+					age:'18'
+				}
+			},
+			components:{
+				sub1:{
+					//props:['a','b'],
+					//新定义方式
+					props:{
+						a:{
+							type:String,
+							required:true
+						},
+						b:{
+							type:String,
+							required:true
+						}
+						
+					},
+					data(){
+						//在组件中data需要使用return
+						//这里把props中的a拷贝到了sub1Foo上
+						//那我们就可以使用sub1Foo 修改了 而且也不会受父亲影响
+						return {
+							sub1Foo : this.a
+						}
+					},
+					template:`
+						<div>
+							<h2>我是子组件</h2>
+							<p>{{ sub1Foo }}</p>
+							<p>{{ b.name}}</p>
+							<p>{{ b.age }}</p>
+							<button style="width:50px;height:20px" @click="changeData"></button>
+						</div>
+					`,
+					created(){
+						console.log(this.a)
+						console.log(this.b)
+					},
+					methods:{
+						changeData(){
+							//孩子不能修改父组件传给组件的值
+							//引用数据类型可以进行修改
+							console.log(this.sub1Foo="chenming")
+						}
+					}
+				}
+			}
+		})
+	</script>
+</body>
+</html>
